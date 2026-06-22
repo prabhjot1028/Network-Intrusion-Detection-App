@@ -64,7 +64,6 @@ To retrain locally:
 python scripts/train_multiclass_model.py
 ```
 
-For Google Colab, use the cells in `MULTICLASS_COLAB_CELLS.md`.
 
 ## Sample Inputs
 
