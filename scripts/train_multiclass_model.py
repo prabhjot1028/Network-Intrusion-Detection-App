@@ -54,6 +54,7 @@ COLUMNS = [
 ]
 
 FEATURES = [
+    # Keeping the feature list small makes the Streamlit form easier to test by hand.
     "duration",
     "protocol_type",
     "service",

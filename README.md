@@ -1,63 +1,62 @@
 # Network Intrusion Detection App
 
-A simple Streamlit project that uses machine learning to classify network traffic from the NSL-KDD/KDD Cup 99 style dataset. The app takes a few traffic features, encodes the categorical values, and predicts whether the traffic is normal or a specific attack type.
+This is a small Streamlit app I built to experiment with machine learning for network intrusion detection. It uses the NSL-KDD/KDD Cup 99 style dataset and predicts whether a network connection is normal or belongs to a specific attack type.
 
-This is meant to be a student portfolio project showing:
+The main goal of the project is not to build a production security tool. I wanted to show the full workflow: preparing a dataset, training a few models, saving the best one, and connecting it to a simple interface.
 
-- basic data preprocessing
-- training and comparing different ML models
-- saving trained models with `joblib`
-- connecting a trained model to a Streamlit interface
+## What It Does
 
-## Features
+- takes basic network traffic details from a Streamlit form
+- encodes categorical fields like protocol, service, and connection flag
+- predicts normal traffic or a specific attack label
+- shows the broader attack family when an attack is detected
+- includes a training script that compares a few models
 
-- Streamlit web interface for manual testing
-- Multiclass attack prediction, not just normal vs attack
-- Attack family display for common NSL-KDD attack labels
-- Training script that compares Decision Tree, Random Forest, and Extra Trees
-- Colab-ready notebook cells in `MULTICLASS_COLAB_CELLS.md`
+## Models Tried
 
-## Project Structure
+The training script compares:
+
+- Decision Tree
+- Random Forest
+- Extra Trees
+
+The best model is saved into the `model/` folder along with the label encoders used by the app.
+
+## Project Files
 
 ```text
-.
-├── app.py
-├── data/
-│   └── nsl_kdd.csv
-├── model/
-│   ├── model.pkl
-│   ├── protocol_encoder.pkl
-│   ├── service_encoder.pkl
-│   └── flag_encoder.pkl
-├── notebooks/
-│   └── 01_training.ipynb
-├── scripts/
-│   └── train_multiclass_model.py
-├── MULTICLASS_COLAB_CELLS.md
-└── requirements.txt
+app.py                         Streamlit app
+data/nsl_kdd.csv               Dataset used for training
+model/model.pkl                Saved trained model
+model/protocol_encoder.pkl     Encoder for protocol_type
+model/service_encoder.pkl      Encoder for service
+model/flag_encoder.pkl         Encoder for flag
+scripts/train_multiclass_model.py
+MULTICLASS_COLAB_CELLS.md      Copy-paste Colab training cells
+requirements.txt               Python dependencies
 ```
 
 ## How To Run
 
-Create a virtual environment if you want to keep dependencies separate, then install the requirements:
+Install the dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Start the Streamlit app:
+Run the app:
 
 ```bash
 streamlit run app.py
 ```
 
-If the default Streamlit port is busy, run:
+If Streamlit says the default port is already being used, run:
 
 ```bash
 streamlit run app.py --server.port 8502
 ```
 
-## Retraining The Model
+## Retraining
 
 To retrain locally:
 
@@ -65,15 +64,7 @@ To retrain locally:
 python scripts/train_multiclass_model.py
 ```
 
-The script trains and compares:
-
-- Decision Tree
-- Random Forest
-- Extra Trees
-
-It saves the best model and encoders into the `model/` folder.
-
-For Google Colab, copy the cells from `MULTICLASS_COLAB_CELLS.md`.
+For Google Colab, use the cells in `MULTICLASS_COLAB_CELLS.md`.
 
 ## Sample Inputs
 
@@ -133,6 +124,6 @@ Attack Detected: guess_passwd
 Attack family: Remote to Local
 ```
 
-## Notes
+## Limitations
 
-This project is for learning and demonstration. Some attack classes in NSL-KDD have very few examples, so the model performs better on common classes than on rare attacks.
+This is a learning project. Some NSL-KDD attack classes have very few examples, so the model is much stronger on common attacks than rare ones. That class imbalance is one of the main limitations of this dataset.

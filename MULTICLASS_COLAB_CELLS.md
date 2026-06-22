@@ -1,6 +1,6 @@
-# Multiclass Colab Cells
+# Multiclass Training Cells
 
-Use these cells when you want the app to show the actual attack type instead of only "attack".
+These are the Colab cells I would use to retrain the app so it predicts the actual attack label instead of only saying "attack".
 
 ## Cell 1 - Imports
 
@@ -60,7 +60,7 @@ df["service"] = service_encoder.fit_transform(df["service"])
 df["flag"] = flag_encoder.fit_transform(df["flag"])
 
 X = df[features]
-y = df["label"]   # Keep the original labels: normal, neptune, satan, etc.
+y = df["label"]   # Keep the original labels so the app can show names like neptune or satan.
 
 print(y.value_counts())
 ```

@@ -4,6 +4,8 @@ import joblib
 import pandas as pd
 import numpy as np
 
+# These are the usual attack families used when discussing KDD/NSL-KDD labels.
+# The model predicts the exact label; this just makes the output easier to read.
 ATTACK_CATEGORIES = {
     "back": "Denial of Service",
     "land": "Denial of Service",
@@ -33,20 +35,16 @@ ATTACK_CATEGORIES = {
 def get_attack_category(prediction):
     return ATTACK_CATEGORIES.get(str(prediction).lower(), "Unknown attack family")
 
-# -------------------------------
-# Page config
-# -------------------------------
+
 st.set_page_config(
     page_title="Network Intrusion Detection System",
     layout="centered",
     initial_sidebar_state="expanded"
 )
 
-# -------------------------------
-# Load model + encoders
-# -------------------------------
 @st.cache_resource
 def load_artifacts():
+    """Load the model files once instead of reloading them on every Streamlit rerun."""
     model = joblib.load("model/model.pkl")
     protocol_encoder = joblib.load("model/protocol_encoder.pkl")
     service_encoder = joblib.load("model/service_encoder.pkl")
@@ -56,39 +54,30 @@ def load_artifacts():
 
 model, protocol_encoder, service_encoder, flag_encoder = load_artifacts()
 
-# -------------------------------
-# App Header
-# -------------------------------
 st.title("Network Intrusion Detection System")
 st.caption(
-    "Machine-learning powered system that classifies network traffic as normal traffic "
-    "or a specific attack type using KDD intrusion detection data."
+    "A small ML demo that classifies network traffic as normal or as a specific "
+    "attack type using KDD intrusion detection data."
 )
 
 st.divider()
 
-# -------------------------------
-# Sidebar project summary
-# -------------------------------
 with st.sidebar:
     st.header("About this project")
     st.write(
         """
-        - **Model:** Trained in Jupyter Notebook  
-        - **Dataset:** KDD Cup 99  
+        - **Model:** Random Forest selected after comparing a few models  
+        - **Dataset:** NSL-KDD / KDD Cup 99 style data  
         - **Task:** Multi-class classification  
-        - **Frontend:** Streamlit  
+        - **Interface:** Streamlit  
         - **Pipeline:**  
           User Input -> Encoding -> Model -> Prediction
         """
     )
 
-# -------------------------------
-# Input section
-# -------------------------------
 st.subheader("Enter Network Traffic Details")
 
-# --- Build mappings from encoded values back to readable labels ---
+# Streamlit shows the text labels, but the saved model expects encoded numbers.
 protocol_mapping = {i: cls for i, cls in enumerate(protocol_encoder.classes_)}
 service_mapping = {i: cls for i, cls in enumerate(service_encoder.classes_)}
 flag_mapping = {i: cls for i, cls in enumerate(flag_encoder.classes_)} if flag_encoder else None
@@ -102,7 +91,6 @@ with col1:
         help="How long the connection lasted"
     )
 
-    # Show text but store numeric label
     protocol_encoded = st.selectbox(
         "Protocol Type",
         options=list(protocol_mapping.keys()),  # numeric labels
@@ -146,9 +134,6 @@ with col2:
 
 st.divider()
 
-# -------------------------------
-# Prediction logic
-# -------------------------------
 if st.button("Run Detection", use_container_width=True):
     # Keep this column order the same as the Colab training cell.
     input_data = {
@@ -167,19 +152,14 @@ if st.button("Run Detection", use_container_width=True):
     st.write("Input for model:")
     st.write(input_df)
 
-    # Prediction
     prediction = model.predict(input_df)[0]
 
-    # Probability (if supported)
     if hasattr(model, "predict_proba"):
         proba = model.predict_proba(input_df)[0]
         confidence = np.max(proba) * 100
     else:
         confidence = None
 
-    # -------------------------------
-    # Output
-    # -------------------------------
     st.subheader("Detection Result")
 
     prediction_text = str(prediction)
